@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YUKI | POS & Inventory System</title>
+    <style>
+        /* --- YUKI AESTHETIC: DARK / INDUSTRIAL / CLEAN --- */
+        :root {
+            --bg-dark: #0f0f0f;
+            --panel-bg: #1a1a1a;
+            --border: #333;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --accent-green: #00e676;
+            --accent-red: #ff3d00;
+            --accent-blue: #2979ff;
+            --highlight: #2d2d2d;
+            --hover-row: #252525;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Desktop default */
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 15px 20px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .brand { font-weight: 900; letter-spacing: 3px; font-size: 1.1rem; }
+        .live-status { font-size: 0.75rem; color: var(--accent-green); display: flex; align-items: center; gap:5px;}
+        .dot { height: 8px; width: 8px; background: var(--accent-green); border-radius: 50%; }
+
+        /* --- LAYOUT CONTAINER --- */
+        .layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR (FORM) --- */
+        .sidebar {
+            width: 350px;
+            background: #141414;
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        /* --- MAIN CONTENT (DASHBOARD) --- */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- FORM ELEMENTS --- */
+        h2 {
+            margin-top: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 4px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus { border-color: var(--accent-blue); background: #2a2a2a; }
+
+        button.save-btn {
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            color: #000;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        button.save-btn:hover { background: #ddd; }
+
+        /* --- DASHBOARD STATS & INVENTORY --- */
+        .total-bar {
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+        .total-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        .total-value { font-size: 1.5rem; font-weight: bold; color: var(--accent-green); }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .info-panel h3 { margin: 0 0 10px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); }
+
+        /* CLICKABLE INVENTORY ROWS */
+        .mini-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .mini-table td { padding: 8px 5px; border-bottom: 1px solid #2a2a2a; transition: 0.2s; }
+        .mini-table tr { cursor: pointer; }
+        .mini-table tr:hover { background-color: #333; color: #fff; } /* Hover Effect */
+        .mini-table tr:last-child td { border-bottom: none; }
+        .count-val { text-align: right; font-weight: bold; color: var(--accent-blue); }
+
+        /* --- FILTER BANNER --- */
+        #filterBanner {
+            background: var(--accent-blue);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; /* Hidden by default */
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        #filterBanner button {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+
+        /* --- TRANSACTION TABLE --- */
+        .table-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 12px; background: #252525; color: #888; font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #2d2d2d; font-size: 0.9rem; vertical-align: middle; }
+        tr:hover { background: var(--hover-row); }
+
+        /* BADGES */
+        .badge { padding: 3px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; display: inline-block; margin-right: 5px; }
+        .bg-size { background: #333; color: #fff; border: 1px solid #555; }
+        .bg-loc { background: #1e3a8a; color: #93c5fd; border: 1px solid #2563eb; }
+
+        .del-btn {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .del-btn:hover { background: var(--accent-red); color: #fff; }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            body { height: auto; overflow-y: auto; }
+            .layout { flex-direction: column; overflow: visible; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+            .main-content { height: auto; overflow: visible; }
+            .inventory-grid { grid-template-columns: 1fr; }
+            header { position: sticky; top: 0; z-index: 100; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">YUKI // ADMIN</div>
+        <div class="live-status"><div class="dot"></div> ONLINE</div>
+    </header>
+
+    <div class="layout">
+        
+        <div class="sidebar">
+            <h2>New Order Entry</h2>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="customerName" required placeholder="Enter Name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="orderDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Design Name</label>
+                    <input type="text" id="designName" placeholder="e.g. Zombie Chainzaw" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Print Location</label>
+                    <select id="printLoc" required>
+                        <option value="Front">FRONT Only</option>
+                        <option value="Back">BACK Only</option>
+                        <option value="Front & Back">FRONT & BACK</option>
+                        <option value="Pocket">Pocket Size</option>
+                        <option value="Sleeve">Sleeve</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Shirt Color</label>
+                    <input type="text" id="shirtColor" list="colors" placeholder="Type or Select..." required>
+                    <datalist id="colors">
+                        <option value="Black">
+                        <option value="White">
+                        <option value="Acid Gray">
+                        <option value="Navy Blue">
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label>Size</label>
+                    <select id="size" required>
+                        <option value="S">Small</option>
+                        <option value="M">Medium</option>
+                        <option value="L">Large</option>
+                        <option value="XL">XL</option>
+                        <option value="2XL">2XL</option>
+                        <option value="3XL">3XL</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (PHP)</label>
+                    <input type="number" id="price" placeholder="0.00" required>
+                </div>
+
+                <button type="submit" class="save-btn" id="submitBtn">Save Order</button>
+                <div id="msg" style="text-align: center; margin-top: 10px; font-size: 0.8rem;"></div>
+            </form>
+        </div>
+
+        <div class="main-content">
+            
+            <div class="total-bar">
+                <div>
+                    <div class="total-label">Total Revenue</div>
+                    <div class="total-value" id="grandTotal">₱0</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="total-label">Orders</div>
+                    <div class="total-value" style="color: #fff; font-size: 1.2rem;" id="orderCount">0</div>
+                </div>
+            </div>
+
+            <div class="inventory-grid">
+                <div class="info-panel">
+                    <h3>Size Count (Click to Filter)</h3>
+                    <table class="mini-table" id="sizeTable">
+                        <tr><td>Loading...</td></tr>
+                    </table>
+                </div>
+                <div class="info-panel">
+                    <h3>Color Count (Click to Filter)</h3>
+                    <table class="mini-table" id="colorTable">
+                        <tr><td>Loading...</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="filterBanner">
+                <span id="filterText">Filtering by...</span>
+                <button onclick="clearFilter()">SHOW ALL</button>
+            </div>
+
+            <div class="table-container" id="listContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Design Details</th>
+                            <th>Size</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionList">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // --- SETUP ---
+    const dbUrl = "https://yukitshirt-default-rtdb.asia-southeast1.firebasedatabase.app/orders";
+    document.getElementById('orderDate').valueAsDate = new Date();
+
+    // Global variables to store data
+    let allOrders = []; 
+    let currentFilter = null; // { type: 'size'|'color', value: 'S' }
+
+    // --- MAIN FUNCTION: LOAD DATA ---
+    async function loadData() {
+        try {
+            const res = await fetch(dbUrl + ".json");
+            const data = await res.json();
+            
+            if (!data) {
+                // Handle empty DB
+                allOrders = [];
+                updateUI();
+                return;
+            }
+
+            // Convert Object to Array and store globally
+            allOrders = Object.entries(data).map(([key, val]) => ({
+                id: key,
+                ...val
+            }));
+
+            // Calculate Totals & Inventory based on FULL LIST
+            calculateTotals(allOrders);
+            
+            // Render Table (applies filter if one exists)
+            renderTable();
+
+        } catch (err) {
+            console.error("Error loading data:", err);
+        }
+    }
+
+    // --- CALCULATE TOTALS & INVENTORY ---
+    function calculateTotals(orders) {
+        let totalRev = 0;
+        let sizeCounts = {};
+        let colorCounts = {};
+
+        orders.forEach(item => {
+            totalRev += Number(item.price);
+            sizeCounts[item.size] = (sizeCounts[item.size] || 0) + 1;
+            
+            let cKey = (item.shirtColor || "Unknown").toUpperCase();
+            colorCounts[cKey] = (colorCounts[cKey] || 0) + 1;
+        });
+
+        // Update Header Stats
+        document.getElementById('orderCount').innerText = orders.length;
+        document.getElementById('grandTotal').innerText = "₱" + totalRev.toLocaleString();
+
+        // Update Inventory Tables
+        renderInventory(sizeCounts, 'sizeTable', 'size');
+        renderInventory(colorCounts, 'colorTable', 'color');
+    }
+
+    // --- RENDER INVENTORY TABLES ---
+    function renderInventory(countsObj, tableId, type) {
+        const tableElem = document.getElementById(tableId);
+        let html = "";
+        
+        // Sort keys
+        const keys = Object.keys(countsObj).sort();
+        // Custom sort for sizes
+        const sizeOrder = ['S','M','L','XL','2XL','3XL'];
+        if(type === 'size') {
+            keys.sort((a,b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
+        }
+
+        keys.forEach(k => {
+            // Added ONCLICK event here
+            html += `<tr onclick="applyFilter('${type}', '${k}')">
+                        <td>${k}</td>
+                        <td class="count-val">${countsObj[k]} <span style="font-size:0.7em">▶</span></td>
+                     </tr>`;
+        });
+        tableElem.innerHTML = html || "<tr><td>-</td></tr>";
+    }
+
+    // --- FILTER FUNCTIONALITY ---
+    function applyFilter(type, value) {
+        currentFilter = { type, value };
+        renderTable(); // Re-draw table with filter
+        
+        // Show Banner
+        const banner = document.getElementById('filterBanner');
+        const text = document.getElementById('filterText');
+        banner.style.display = 'flex';
+        text.innerText = `SHOWING: ${value.toUpperCase()} (${type.toUpperCase()})`;
+        
+        // AUTO SCROLL to Table
+        document.getElementById('listContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function clearFilter() {
+        currentFilter = null;
+        document.getElementById('filterBanner').style.display = 'none';
+        renderTable(); // Show all
+    }
+
+    // --- RENDER TABLE (With Filter Logic) ---
+    function renderTable() {
+        const tableBody = document.getElementById('transactionList');
+        let html = "";
+
+        // Filter the list if needed
+        let displayList = allOrders;
+        if (currentFilter) {
+            displayList = allOrders.filter(item => {
+                if (currentFilter.type === 'size') return item.size === currentFilter.value;
+                if (currentFilter.type === 'color') return item.shirtColor.toUpperCase() === currentFilter.value;
+                return true;
+            });
+        }
+
+        // Reverse to show newest first
+        const sortedList = [...displayList].reverse();
+
+        if (sortedList.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px'>No results found.</td></tr>";
+            return;
+        }
+
+        sortedList.forEach(item => {
+            const printLoc = item.printLoc || "Front"; 
+            
+            html += `
+                <tr>
+                    <td style="font-size: 0.8rem; color:#888;">${item.date}</td>
+                    <td style="font-weight:bold; color: #fff;">${item.customerName}</td>
+                    <td>
+                        <div style="font-weight:600; font-size: 0.95rem;">${item.designName}</div>
+                        <div style="margin-top:4px;">
+                            <span class="badge bg-loc">${printLoc}</span>
+                            <span style="font-size:0.75rem; color:#aaa;">${item.shirtColor}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-size">${item.size}</span></td>
+                    <td style="color: #00e676; font-weight:bold;">₱${item.price}</td>
+                    <td>
+                        <button class="del-btn" onclick="deleteOrder('${item.id}')">X</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = html;
+    }
+
+    // --- SAVE ORDER ---
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('msg');
+        
+        btn.disabled = true;
+        btn.innerText = "SAVING...";
+
+        const newItem = {
+            customerName: document.getElementById('customerName').value,
+            date: document.getElementById('orderDate').value,
+            designName: document.getElementById('designName').value,
+            printLoc: document.getElementById('printLoc').value,
+            shirtColor: document.getElementById('shirtColor').value,
+            size: document.getElementById('size').value,
+            price: document.getElementById('price').value,
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            await fetch(dbUrl + ".json", {
+                method: 'POST',
+                body: JSON.stringify(newItem),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            msg.style.color = "#00e676";
+            msg.innerText = "ORDER SAVED!";
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderDate').valueAsDate = new Date();
+            loadData(); // Reload data
+        } catch (error) {
+            msg.style.color = "red";
+            msg.innerText = "FAILED TO SAVE";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "SAVE ORDER";
+            setTimeout(() => msg.innerText = "", 2000);
+        }
+    });
+
+    // --- DELETE ORDER ---
+    async function deleteOrder(id) {
+        if(confirm("Delete this order permanently?")) {
+            await fetch(`${dbUrl}/${id}.json`, { method: 'DELETE' });
+            loadData();
+        }
+    }
+
+    // --- INIT ---
+    loadData();
+    setInterval(loadData, 10000); // Auto refresh data every 10s
+
+</script>
+
+</body>
+</html>
