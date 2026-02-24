@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUKI | Ultimate POS</title>
+    <title>YUKI | Production & POS</title>
     <style>
         /* --- YUKI AESTHETIC: DARK / INDUSTRIAL / CLEAN --- */
         :root {
@@ -151,7 +151,7 @@
         .mini-table tr { cursor: pointer; }
         .mini-table tr:hover { background-color: #333; color: #fff; } 
         .mini-table tr:last-child td { border-bottom: none; }
-        .count-val { text-align: right; font-weight: bold; color: var(--accent-blue); }
+        .count-val { text-align: right; font-weight: bold; color: var(--accent-orange); } /* Orange implies Pending */
 
         /* --- FILTER BANNER --- */
         #filterBanner {
@@ -184,17 +184,17 @@
             overflow-x: auto;
         }
 
-        table { width: 100%; border-collapse: collapse; min-width: 800px; } /* Wider min-width for new column */
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { text-align: left; padding: 12px; background: #252525; color: #888; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #2d2d2d; font-size: 0.9rem; vertical-align: middle; }
         tr:hover { background: var(--hover-row); }
 
-        /* BADGES */
+        /* BADGES & COLORS */
         .badge { padding: 3px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; display: inline-block; margin-right: 5px; }
         .bg-size { background: #333; color: #fff; border: 1px solid #555; }
         .bg-loc { background: #1e3a8a; color: #93c5fd; border: 1px solid #2563eb; }
 
-        /* STATUS SELECTOR (Inside Table) */
+        /* STATUS SELECTOR */
         .status-select {
             padding: 5px;
             font-size: 0.75rem;
@@ -203,8 +203,8 @@
             text-transform: uppercase;
             border: 1px solid transparent;
             cursor: pointer;
+            width: 100%;
         }
-        /* Status Colors */
         .st-pending { background: #332b00; color: var(--accent-orange); border-color: #665200; }
         .st-paid { background: #003300; color: var(--accent-green); border-color: #006600; }
         .st-delivery { background: #001a4d; color: var(--accent-blue); border-color: #003399; }
@@ -317,24 +317,24 @@
             
             <div class="total-bar">
                 <div>
-                    <div class="total-label">Total Revenue (Active)</div>
+                    <div class="total-label">Total Revenue</div>
                     <div class="total-value" id="grandTotal">₱0</div>
                 </div>
                 <div style="text-align: right;">
-                    <div class="total-label">Orders</div>
-                    <div class="total-value" style="color: #fff; font-size: 1.2rem;" id="orderCount">0</div>
+                    <div class="total-label">Pending Orders</div>
+                    <div class="total-value" style="color: var(--accent-orange); font-size: 1.2rem;" id="pendingCount">0</div>
                 </div>
             </div>
 
             <div class="inventory-grid">
                 <div class="info-panel">
-                    <h3>Size Count (Click to Filter)</h3>
+                    <h3>Pending Sizes (To Do)</h3>
                     <table class="mini-table" id="sizeTable">
                         <tr><td>Loading...</td></tr>
                     </table>
                 </div>
                 <div class="info-panel">
-                    <h3>Color Count (Click to Filter)</h3>
+                    <h3>Pending Colors (To Do)</h3>
                     <table class="mini-table" id="colorTable">
                         <tr><td>Loading...</td></tr>
                     </table>
@@ -352,9 +352,10 @@
                         <tr>
                             <th>Date</th>
                             <th>Customer</th>
-                            <th>Design Details</th>
+                            <th>Design</th>
                             <th>Size</th>
-                            <th>Status</th> <th>Price</th>
+                            <th style="width:120px;">Status</th>
+                            <th>Price</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -382,7 +383,7 @@
             
             if (!data) {
                 allOrders = [];
-                updateUI();
+                updateUIEmpty();
                 return;
             }
 
@@ -399,26 +400,47 @@
         }
     }
 
-    // --- CALCULATE TOTALS (IGNORE CANCELLED) ---
+    function updateUIEmpty() {
+        document.getElementById('grandTotal').innerText = "₱0";
+        document.getElementById('pendingCount').innerText = "0";
+        document.getElementById('sizeTable').innerHTML = "<tr><td>No pending work</td></tr>";
+        document.getElementById('colorTable').innerHTML = "<tr><td>No pending work</td></tr>";
+        document.getElementById('transactionList').innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No orders yet.</td></tr>";
+    }
+
+    // --- CALCULATE TOTALS (NEW LOGIC) ---
     function calculateTotals(orders) {
         let totalRev = 0;
-        let validOrdersCount = 0;
+        let pendingCount = 0;
         let sizeCounts = {};
         let colorCounts = {};
 
         orders.forEach(item => {
-            // IMPORTANT: Skip calculation if cancelled
-            if (item.status === "Cancelled") return;
+            const status = (item.status || "Pending").trim();
 
-            validOrdersCount++;
-            totalRev += Number(item.price);
-            sizeCounts[item.size] = (sizeCounts[item.size] || 0) + 1;
-            
-            let cKey = (item.shirtColor || "Unknown").toUpperCase();
-            colorCounts[cKey] = (colorCounts[cKey] || 0) + 1;
+            // 1. REVENUE CALCULATION:
+            // Count Revenue for everything EXCEPT Cancelled
+            if (status !== "Cancelled") {
+                totalRev += Number(item.price);
+            }
+
+            // 2. INVENTORY COUNT LOGIC (THE USER REQUEST):
+            // ONLY COUNT IF STATUS IS 'PENDING'
+            // If Paid, For Delivery, or Cancelled -> It will be ignored here (Auto Minus)
+            if (status === "Pending") {
+                pendingCount++;
+                
+                // Count Size
+                sizeCounts[item.size] = (sizeCounts[item.size] || 0) + 1;
+                
+                // Count Color
+                let cKey = (item.shirtColor || "Unknown").toUpperCase();
+                colorCounts[cKey] = (colorCounts[cKey] || 0) + 1;
+            }
         });
 
-        document.getElementById('orderCount').innerText = validOrdersCount;
+        // Update Stats
+        document.getElementById('pendingCount').innerText = pendingCount; // Only Pending count
         document.getElementById('grandTotal').innerText = "₱" + totalRev.toLocaleString();
 
         renderInventory(sizeCounts, 'sizeTable', 'size');
@@ -430,18 +452,24 @@
         let html = "";
         const keys = Object.keys(countsObj).sort();
         
+        // Custom Sort for Sizes
         const sizeOrder = ['S','M','L','XL','2XL','3XL'];
         if(type === 'size') {
             keys.sort((a,b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
         }
 
+        if (keys.length === 0) {
+            tableElem.innerHTML = "<tr><td style='color:#666'>All caught up! No pending.</td></tr>";
+            return;
+        }
+
         keys.forEach(k => {
             html += `<tr onclick="applyFilter('${type}', '${k}')">
                         <td>${k}</td>
-                        <td class="count-val">${countsObj[k]} <span style="font-size:0.7em">▶</span></td>
+                        <td class="count-val">${countsObj[k]}</td>
                      </tr>`;
         });
-        tableElem.innerHTML = html || "<tr><td>-</td></tr>";
+        tableElem.innerHTML = html;
     }
 
     // --- FILTERS ---
@@ -449,7 +477,7 @@
         currentFilter = { type, value };
         renderTable(); 
         document.getElementById('filterBanner').style.display = 'flex';
-        document.getElementById('filterText').innerText = `SHOWING: ${value.toUpperCase()} (${type.toUpperCase()})`;
+        document.getElementById('filterText').innerText = `PENDING FILTER: ${value.toUpperCase()}`;
         document.getElementById('listContainer').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -465,9 +493,13 @@
         let html = "";
 
         let displayList = allOrders;
+        
+        // Filter Logic
         if (currentFilter) {
             displayList = allOrders.filter(item => {
-                // Ignore status filter for now, focused on size/color
+                // If I click "Small" in the pending list, only show PENDING SMALL items
+                if (item.status !== "Pending") return false; // Strict Pending Filter
+                
                 if (currentFilter.type === 'size') return item.size === currentFilter.value;
                 if (currentFilter.type === 'color') return item.shirtColor.toUpperCase() === currentFilter.value;
                 return true;
@@ -477,13 +509,13 @@
         const sortedList = [...displayList].reverse();
 
         if (sortedList.length === 0) {
-            tableBody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No results.</td></tr>";
+            tableBody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No matching orders.</td></tr>";
             return;
         }
 
         sortedList.forEach(item => {
             const printLoc = item.printLoc || "Front"; 
-            const status = item.status || "Pending"; // Default
+            const status = item.status || "Pending"; 
 
             // COLOR CLASS FOR STATUS
             let statusClass = "st-pending";
@@ -491,7 +523,6 @@
             if(status === "For Delivery") statusClass = "st-delivery";
             if(status === "Cancelled") statusClass = "st-cancelled";
 
-            // Row Transparency if Cancelled
             const rowStyle = status === "Cancelled" ? "opacity: 0.5;" : "";
 
             html += `
@@ -527,16 +558,17 @@
         tableBody.innerHTML = html;
     }
 
-    // --- UPDATE STATUS (LIVE) ---
+    // --- UPDATE STATUS (LIVE REFRESH) ---
     async function updateStatus(id, newStatus) {
-        // Optimistic UI Update (Optional, but here we just reload)
         try {
+            // Update Database
             await fetch(`${dbUrl}/${id}.json`, {
-                method: 'PATCH', // Update specific field only
+                method: 'PATCH',
                 body: JSON.stringify({ status: newStatus }),
                 headers: { 'Content-Type': 'application/json' }
             });
-            loadData(); // Reload to update colors and calculations
+            // Reload to apply "Auto Minus" logic
+            loadData(); 
         } catch (err) {
             alert("Failed to update status");
         }
@@ -558,7 +590,7 @@
             printLoc: document.getElementById('printLoc').value,
             shirtColor: document.getElementById('shirtColor').value,
             size: document.getElementById('size').value,
-            status: document.getElementById('status').value, // FROM INPUT
+            status: document.getElementById('status').value, 
             price: document.getElementById('price').value,
             timestamp: new Date().toISOString()
         };
