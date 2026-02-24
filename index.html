@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUKI | Production & POS</title>
+    <title>YUKI | Ultimate Production POS</title>
     <style>
-        /* --- YUKI AESTHETIC: DARK / INDUSTRIAL / CLEAN --- */
+        /* --- YUKI AESTHETIC: DARK / INDUSTRIAL / COMPACT --- */
         :root {
-            --bg-dark: #0f0f0f;
-            --panel-bg: #1a1a1a;
+            --bg-dark: #121212;
+            --panel-bg: #1e1e1e;
             --border: #333;
             --text-main: #e0e0e0;
             --text-muted: #888;
@@ -16,7 +16,7 @@
             --accent-orange: #ff9100;
             --accent-blue: #2979ff;
             --accent-red: #ff3d00;
-            --hover-row: #252525;
+            --hover-row: #2a2a2a;
         }
 
         * { box-sizing: border-box; }
@@ -34,16 +34,17 @@
 
         /* --- HEADER --- */
         header {
-            padding: 15px 20px;
+            padding: 10px 20px;
             background: var(--panel-bg);
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            height: 50px;
         }
-        .brand { font-weight: 900; letter-spacing: 3px; font-size: 1.1rem; }
-        .live-status { font-size: 0.75rem; color: var(--accent-green); display: flex; align-items: center; gap:5px;}
+        .brand { font-weight: 900; letter-spacing: 3px; font-size: 1rem; }
+        .live-status { font-size: 0.7rem; color: var(--accent-green); display: flex; align-items: center; gap:5px;}
         .dot { height: 8px; width: 8px; background: var(--accent-green); border-radius: 50%; }
 
         /* --- LAYOUT CONTAINER --- */
@@ -55,10 +56,10 @@
 
         /* --- SIDEBAR (FORM) --- */
         .sidebar {
-            width: 350px;
-            background: #141414;
+            width: 320px;
+            background: #181818;
             border-right: 1px solid var(--border);
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
             flex-shrink: 0;
         }
@@ -66,46 +67,44 @@
         /* --- MAIN CONTENT (DASHBOARD) --- */
         .main-content {
             flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+            padding: 15px;
+            overflow-y: hidden; /* Internal scrolling only */
             background: var(--bg-dark);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
-        /* --- FORM ELEMENTS --- */
+        /* --- FORM STYLES --- */
         h2 {
             margin-top: 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-muted);
             border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
 
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; }
         
         input, select {
             width: 100%;
-            padding: 12px;
-            background: #222;
+            padding: 10px;
+            background: #252525;
             border: 1px solid var(--border);
             color: #fff;
             border-radius: 4px;
             outline: none;
-            font-size: 0.95rem;
-            transition: border 0.3s;
+            font-size: 0.9rem;
         }
-        
         input:focus, select:focus { border-color: var(--accent-blue); background: #2a2a2a; }
 
         button.save-btn {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: #fff;
             color: #000;
             font-weight: 800;
@@ -115,120 +114,178 @@
             letter-spacing: 1px;
             margin-top: 10px;
             border-radius: 4px;
+            font-size: 0.9rem;
         }
         button.save-btn:hover { background: #ddd; }
 
-        /* --- DASHBOARD STATS --- */
-        .total-bar {
-            background: #222;
-            padding: 20px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border);
-        }
-        .total-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
-        .total-value { font-size: 1.5rem; font-weight: bold; color: var(--accent-green); }
-
-        /* --- INVENTORY GRID --- */
+        /* --- 3-COLUMN SUMMARY GRID --- */
         .inventory-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr 1fr 1fr; /* 3 Columns: Size, Color, Status */
+            gap: 12px;
+            flex-shrink: 0;
         }
 
         .info-panel {
             background: var(--panel-bg);
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            max-height: 200px; /* Fixed height for scroll */
+            overflow: hidden;
         }
-        .info-panel h3 { margin: 0 0 10px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); }
 
-        .mini-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .mini-table td { padding: 8px 5px; border-bottom: 1px solid #2a2a2a; transition: 0.2s; }
-        .mini-table tr { cursor: pointer; }
-        .mini-table tr:hover { background-color: #333; color: #fff; } 
-        .mini-table tr:last-child td { border-bottom: none; }
-        .count-val { text-align: right; font-weight: bold; color: var(--accent-orange); } /* Orange implies Pending */
+        .panel-header {
+            padding: 8px 12px;
+            background: #252525;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #aaa;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .reset-link {
+            font-size: 0.65rem;
+            color: var(--accent-blue);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .reset-link:hover { color: #fff; }
 
-        /* --- FILTER BANNER --- */
-        #filterBanner {
+        .scroll-area {
+            overflow-y: auto;
+            flex: 1;
+            padding: 0; 
+        }
+
+        /* --- CLICKABLE FILTER ROWS (IMPROVED UI) --- */
+        .mini-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        
+        /* Row Styles */
+        .mini-table tr { 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        
+        .mini-table td { padding: 8px 12px; }
+
+        /* Hover Effect - Makes it clear it's a filter */
+        .mini-table tr:hover { 
+            background-color: #333; 
+            color: #fff;
+            padding-left: 5px; /* Subtle movement */
+        }
+        
+        /* ACTIVE FILTER STATE (Highlights the selected one) */
+        .active-row {
+            background-color: var(--accent-blue) !important;
+            color: #fff !important;
+        }
+        .active-row .cnt-pending, .active-row .cnt-paid, .active-row .cnt-delivery, .active-row .cnt-cancel {
+            color: #fff !important; /* Force white text on blue background */
+        }
+
+        /* FIX FOR "SOBRA LAYO NG QTY" */
+        .mini-table td:last-child {
+            text-align: right;
+            width: 1%; /* Shrink column to fit content */
+            white-space: nowrap; /* Prevent wrapping */
+            font-weight: bold;
+        }
+
+        /* Color Coding for Counts (When not active) */
+        .cnt-pending { color: var(--accent-orange); }
+        .cnt-paid { color: var(--accent-green); }
+        .cnt-delivery { color: var(--accent-blue); }
+        .cnt-cancel { color: var(--accent-red); }
+
+        /* --- FILTER FOOTER (STICKY BOTTOM) --- */
+        #filterFooter {
             background: var(--accent-blue);
             color: white;
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 4px;
-            display: none; 
+            display: none; /* Hidden by default */
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
             font-size: 0.9rem;
+            margin-bottom: 5px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
         }
-        #filterBanner button {
-            background: #000;
+        #filterFooter button {
+            background: rgba(0,0,0,0.3);
             color: #fff;
             border: none;
-            padding: 5px 10px;
+            padding: 5px 12px;
             cursor: pointer;
             border-radius: 3px;
             text-transform: uppercase;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
+        #filterFooter button:hover { background: rgba(0,0,0,0.5); }
 
         /* --- TRANSACTION TABLE --- */
-        .table-container {
+        .table-wrapper {
             background: var(--panel-bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow-x: auto;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1; /* Takes remaining height */
+        }
+        
+        .table-scroll {
+            overflow-y: auto;
+            flex: 1;
         }
 
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { text-align: left; padding: 12px; background: #252525; color: #888; font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #2d2d2d; font-size: 0.9rem; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { 
+            text-align: left; padding: 10px 12px; 
+            background: #252525; color: #888; 
+            font-size: 0.75rem; text-transform: uppercase; 
+            position: sticky; top: 0; z-index: 2;
+        }
+        td { padding: 8px 12px; border-bottom: 1px solid #2d2d2d; font-size: 0.85rem; vertical-align: middle; }
         tr:hover { background: var(--hover-row); }
 
-        /* BADGES & COLORS */
-        .badge { padding: 3px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; display: inline-block; margin-right: 5px; }
+        /* BADGES */
+        .badge { padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; display: inline-block; margin-right: 5px; }
         .bg-size { background: #333; color: #fff; border: 1px solid #555; }
-        .bg-loc { background: #1e3a8a; color: #93c5fd; border: 1px solid #2563eb; }
+        .bg-loc { background: #152857; color: #93c5fd; border: 1px solid #1e3a8a; }
 
         /* STATUS SELECTOR */
         .status-select {
-            padding: 5px;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border: 1px solid transparent;
-            cursor: pointer;
-            width: 100%;
+            padding: 4px; font-size: 0.7rem; border-radius: 3px; font-weight: bold; text-transform: uppercase; border: 1px solid transparent; cursor: pointer; width: 100%;
         }
         .st-pending { background: #332b00; color: var(--accent-orange); border-color: #665200; }
         .st-paid { background: #003300; color: var(--accent-green); border-color: #006600; }
         .st-delivery { background: #001a4d; color: var(--accent-blue); border-color: #003399; }
-        .st-cancelled { background: #2a1a1a; color: var(--accent-red); border-color: #552222; opacity: 0.7; }
+        .st-cancelled { background: #2a1a1a; color: var(--accent-red); border-color: #552222; opacity: 0.6; }
 
         .del-btn {
-            background: transparent;
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-            padding: 6px 10px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            border-radius: 4px;
-            font-weight: bold;
+            background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);
+            padding: 4px 8px; cursor: pointer; font-size: 0.65rem; border-radius: 3px; font-weight: bold;
         }
         .del-btn:hover { background: var(--accent-red); color: #fff; }
 
         /* --- MOBILE RESPONSIVE --- */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             body { height: auto; overflow-y: auto; }
             .layout { flex-direction: column; overflow: visible; }
             .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
             .main-content { height: auto; overflow: visible; }
-            .inventory-grid { grid-template-columns: 1fr; }
+            .inventory-grid { grid-template-columns: 1fr; } 
+            .info-panel { max-height: 200px; }
             header { position: sticky; top: 0; z-index: 100; }
         }
     </style>
@@ -236,30 +293,27 @@
 <body>
 
     <header>
-        <div class="brand">YUKI // ADMIN</div>
-        <div class="live-status"><div class="dot"></div> LIVE</div>
+        <div class="brand">YUKI // PRODUCTION</div>
+        <div class="live-status"><div class="dot"></div> ONLINE</div>
     </header>
 
     <div class="layout">
         
         <div class="sidebar">
-            <h2>New Order Entry</h2>
+            <h2>New Order</h2>
             <form id="orderForm">
                 <div class="form-group">
                     <label>Customer Name</label>
                     <input type="text" id="customerName" required placeholder="Enter Name">
                 </div>
-                
                 <div class="form-group">
                     <label>Date</label>
                     <input type="date" id="orderDate" required>
                 </div>
-
                 <div class="form-group">
                     <label>Design Name</label>
                     <input type="text" id="designName" placeholder="e.g. Zombie Chainzaw" required>
                 </div>
-
                 <div class="form-group">
                     <label>Print Location</label>
                     <select id="printLoc" required>
@@ -270,7 +324,6 @@
                         <option value="Sleeve">Sleeve</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label>Shirt Color</label>
                     <input type="text" id="shirtColor" list="colors" placeholder="Type or Select..." required>
@@ -281,7 +334,6 @@
                         <option value="Navy Blue">
                     </datalist>
                 </div>
-
                 <div class="form-group">
                     <label>Size</label>
                     <select id="size" required>
@@ -293,89 +345,107 @@
                         <option value="3XL">3XL</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Initial Status</label>
+                    <label>Status</label>
                     <select id="status" required>
                         <option value="Pending">PENDING</option>
                         <option value="Paid">PAID</option>
                         <option value="For Delivery">FOR DELIVERY</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label>Price (PHP)</label>
                     <input type="number" id="price" placeholder="0.00" required>
                 </div>
 
                 <button type="submit" class="save-btn" id="submitBtn">Save Order</button>
-                <div id="msg" style="text-align: center; margin-top: 10px; font-size: 0.8rem;"></div>
+                <div id="msg" style="text-align: center; margin-top: 10px; font-size: 0.75rem;"></div>
             </form>
         </div>
 
         <div class="main-content">
-            
-            <div class="total-bar">
-                <div>
-                    <div class="total-label">Total Revenue</div>
-                    <div class="total-value" id="grandTotal">₱0</div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="total-label">Pending Orders</div>
-                    <div class="total-value" style="color: var(--accent-orange); font-size: 1.2rem;" id="pendingCount">0</div>
-                </div>
-            </div>
 
             <div class="inventory-grid">
+                
                 <div class="info-panel">
-                    <h3>Pending Sizes (To Do)</h3>
-                    <table class="mini-table" id="sizeTable">
-                        <tr><td>Loading...</td></tr>
-                    </table>
+                    <div class="panel-header">
+                        <span>CLICK TO FILTER SIZE</span>
+                        <span class="reset-link" onclick="clearFilter()">RESET</span>
+                    </div>
+                    <div class="scroll-area">
+                        <table class="mini-table" id="sizeTable">
+                            <tr><td>Loading...</td></tr>
+                        </table>
+                    </div>
                 </div>
+
                 <div class="info-panel">
-                    <h3>Pending Colors (To Do)</h3>
-                    <table class="mini-table" id="colorTable">
-                        <tr><td>Loading...</td></tr>
+                    <div class="panel-header">
+                        <span>CLICK TO FILTER COLOR</span>
+                        <span class="reset-link" onclick="clearFilter()">RESET</span>
+                    </div>
+                    <div class="scroll-area">
+                        <table class="mini-table" id="colorTable">
+                            <tr><td>Loading...</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <div class="panel-header">
+                        <span>CLICK TO FILTER STATUS</span>
+                        <span class="reset-link" onclick="clearFilter()">RESET</span>
+                    </div>
+                    <div class="scroll-area">
+                        <table class="mini-table" id="statusTable">
+                            <tr><td>Loading...</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="filterFooter">
+                <div id="filterInfo">
+                    <span id="filterLabel">FILTER: NONE</span> | 
+                    ITEMS: <span id="filterCount">0</span> | 
+                    VALUE: <span id="filterVal">₱0</span>
+                </div>
+                <button onclick="clearFilter()">CLEAR FILTER</button>
+            </div>
+
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Design Details</th>
+                                <th>Size</th>
+                                <th style="width:110px;">Status</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionList">
+                            </tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="filterBanner">
-                <span id="filterText">Filtering by...</span>
-                <button onclick="clearFilter()">SHOW ALL</button>
-            </div>
-
-            <div class="table-container" id="listContainer">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Customer</th>
-                            <th>Design</th>
-                            <th>Size</th>
-                            <th style="width:120px;">Status</th>
-                            <th>Price</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactionList">
-                        </tbody>
-                </table>
-            </div>
         </div>
-
     </div>
 
 <script>
-    // --- SETUP ---
+    // --- CONFIGURATION ---
     const dbUrl = "https://yukitshirt-default-rtdb.asia-southeast1.firebasedatabase.app/orders";
     document.getElementById('orderDate').valueAsDate = new Date();
 
     let allOrders = []; 
-    let currentFilter = null; 
+    let currentFilter = null; // { type: 'size'|'color'|'status', value: '...' }
 
-    // --- MAIN: LOAD DATA ---
+    // --- LOAD DATA ---
     async function loadData() {
         try {
             const res = await fetch(dbUrl + ".json");
@@ -383,7 +453,7 @@
             
             if (!data) {
                 allOrders = [];
-                updateUIEmpty();
+                updateEmpty();
                 return;
             }
 
@@ -392,152 +462,195 @@
                 ...val
             }));
 
-            calculateTotals(allOrders);
+            processData(allOrders);
             renderTable();
 
         } catch (err) {
-            console.error("Error loading data:", err);
+            console.error(err);
         }
     }
 
-    function updateUIEmpty() {
-        document.getElementById('grandTotal').innerText = "₱0";
-        document.getElementById('pendingCount').innerText = "0";
-        document.getElementById('sizeTable').innerHTML = "<tr><td>No pending work</td></tr>";
-        document.getElementById('colorTable').innerHTML = "<tr><td>No pending work</td></tr>";
-        document.getElementById('transactionList').innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No orders yet.</td></tr>";
+    function updateEmpty() {
+        document.getElementById('sizeTable').innerHTML = "<tr><td style='color:#666; text-align:center'>Empty</td></tr>";
+        document.getElementById('colorTable').innerHTML = "<tr><td style='color:#666; text-align:center'>Empty</td></tr>";
+        document.getElementById('statusTable').innerHTML = "<tr><td style='color:#666; text-align:center'>Empty</td></tr>";
+        document.getElementById('transactionList').innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No data.</td></tr>";
     }
 
-    // --- CALCULATE TOTALS (NEW LOGIC) ---
-    function calculateTotals(orders) {
-        let totalRev = 0;
-        let pendingCount = 0;
+    // --- PROCESS DATA FOR SUMMARIES ---
+    function processData(orders) {
         let sizeCounts = {};
         let colorCounts = {};
+        let statusCounts = {
+            "Pending": 0,
+            "Paid": 0,
+            "For Delivery": 0,
+            "Cancelled": 0
+        };
 
         orders.forEach(item => {
-            const status = (item.status || "Pending").trim();
-
-            // 1. REVENUE CALCULATION:
-            // Count Revenue for everything EXCEPT Cancelled
-            if (status !== "Cancelled") {
-                totalRev += Number(item.price);
+            const status = (item.status || "Pending");
+            
+            // 1. Status Counts (Count EVERYTHING based on status)
+            if (statusCounts[status] !== undefined) {
+                statusCounts[status]++;
+            } else {
+                statusCounts[status] = 1;
             }
 
-            // 2. INVENTORY COUNT LOGIC (THE USER REQUEST):
-            // ONLY COUNT IF STATUS IS 'PENDING'
-            // If Paid, For Delivery, or Cancelled -> It will be ignored here (Auto Minus)
+            // 2. Inventory Counts (ONLY Count Pending for production "to-do")
             if (status === "Pending") {
-                pendingCount++;
-                
-                // Count Size
                 sizeCounts[item.size] = (sizeCounts[item.size] || 0) + 1;
-                
-                // Count Color
                 let cKey = (item.shirtColor || "Unknown").toUpperCase();
                 colorCounts[cKey] = (colorCounts[cKey] || 0) + 1;
             }
         });
 
-        // Update Stats
-        document.getElementById('pendingCount').innerText = pendingCount; // Only Pending count
-        document.getElementById('grandTotal').innerText = "₱" + totalRev.toLocaleString();
-
-        renderInventory(sizeCounts, 'sizeTable', 'size');
-        renderInventory(colorCounts, 'colorTable', 'color');
+        renderSummaryTable(sizeCounts, 'sizeTable', 'size', 'cnt-pending');
+        renderSummaryTable(colorCounts, 'colorTable', 'color', 'cnt-pending');
+        renderStatusTable(statusCounts, 'statusTable');
     }
 
-    function renderInventory(countsObj, tableId, type) {
-        const tableElem = document.getElementById(tableId);
+    // --- RENDER STANDARD SUMMARY (Size/Color) ---
+    function renderSummaryTable(counts, tableId, type, colorClass) {
+        const table = document.getElementById(tableId);
         let html = "";
-        const keys = Object.keys(countsObj).sort();
+        const keys = Object.keys(counts).sort();
         
-        // Custom Sort for Sizes
+        // Custom sort for size
         const sizeOrder = ['S','M','L','XL','2XL','3XL'];
-        if(type === 'size') {
-            keys.sort((a,b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
-        }
+        if(type === 'size') keys.sort((a,b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
 
-        if (keys.length === 0) {
-            tableElem.innerHTML = "<tr><td style='color:#666'>All caught up! No pending.</td></tr>";
-            return;
-        }
+        if(keys.length === 0) html = "<tr><td style='color:#555; font-style:italic; font-size:0.75rem; padding:10px;'>No pending work</td></tr>";
 
         keys.forEach(k => {
-            html += `<tr onclick="applyFilter('${type}', '${k}')">
+            // Check if active
+            const isActive = (currentFilter && currentFilter.type === type && currentFilter.value === k) ? 'active-row' : '';
+            
+            html += `<tr class="${isActive}" onclick="applyFilter('${type}', '${k}')">
                         <td>${k}</td>
-                        <td class="count-val">${countsObj[k]}</td>
+                        <td class="${colorClass}">${counts[k]}</td>
                      </tr>`;
         });
-        tableElem.innerHTML = html;
+        table.innerHTML = html;
     }
 
-    // --- FILTERS ---
+    // --- RENDER STATUS SUMMARY (Specific for Status Panel) ---
+    function renderStatusTable(counts, tableId) {
+        const table = document.getElementById(tableId);
+        let html = "";
+        
+        // Define order and color map
+        const statuses = [
+            { key: "Pending", color: "cnt-pending" },
+            { key: "Paid", color: "cnt-paid" },
+            { key: "For Delivery", color: "cnt-delivery" },
+            { key: "Cancelled", color: "cnt-cancel" }
+        ];
+
+        statuses.forEach(s => {
+            let count = counts[s.key] || 0;
+            const isActive = (currentFilter && currentFilter.type === 'status' && currentFilter.value === s.key) ? 'active-row' : '';
+
+            html += `<tr class="${isActive}" onclick="applyFilter('status', '${s.key}')">
+                        <td>${s.key.toUpperCase()}</td>
+                        <td class="${s.color}">${count}</td>
+                     </tr>`;
+        });
+        table.innerHTML = html;
+    }
+
+    // --- FILTER LOGIC ---
     function applyFilter(type, value) {
+        // Toggle off if clicking the same one
+        if (currentFilter && currentFilter.type === type && currentFilter.value === value) {
+            clearFilter();
+            return;
+        }
         currentFilter = { type, value };
-        renderTable(); 
-        document.getElementById('filterBanner').style.display = 'flex';
-        document.getElementById('filterText').innerText = `PENDING FILTER: ${value.toUpperCase()}`;
-        document.getElementById('listContainer').scrollIntoView({ behavior: 'smooth' });
+        // Refresh summary tables to show highlight
+        processData(allOrders); 
+        renderTable();
     }
 
     function clearFilter() {
         currentFilter = null;
-        document.getElementById('filterBanner').style.display = 'none';
-        renderTable(); 
+        processData(allOrders); // Remove highlights
+        renderTable();
     }
 
-    // --- RENDER TABLE ---
+    // --- RENDER MAIN TABLE & CALCULATE FILTER TOTALS ---
     function renderTable() {
-        const tableBody = document.getElementById('transactionList');
-        let html = "";
-
-        let displayList = allOrders;
+        const tbody = document.getElementById('transactionList');
+        const footer = document.getElementById('filterFooter');
         
-        // Filter Logic
+        let filteredData = allOrders;
+
+        // Apply Filter
         if (currentFilter) {
-            displayList = allOrders.filter(item => {
-                // If I click "Small" in the pending list, only show PENDING SMALL items
-                if (item.status !== "Pending") return false; // Strict Pending Filter
-                
-                if (currentFilter.type === 'size') return item.size === currentFilter.value;
-                if (currentFilter.type === 'color') return item.shirtColor.toUpperCase() === currentFilter.value;
+            filteredData = allOrders.filter(item => {
+                const status = item.status || "Pending";
+                const size = item.size;
+                const color = (item.shirtColor || "").toUpperCase();
+
+                if (currentFilter.type === 'status') return status === currentFilter.value;
+                if (currentFilter.type === 'size') return size === currentFilter.value && status === 'Pending'; // Strict Pending for Size
+                if (currentFilter.type === 'color') return color === currentFilter.value && status === 'Pending'; // Strict Pending for Color
                 return true;
             });
+
+            // Show Footer
+            footer.style.display = 'flex';
+            document.getElementById('filterLabel').innerText = `FILTER: ${currentFilter.value.toUpperCase()}`;
+        } else {
+            // Show Totals for ALL (Active Revenue)
+            footer.style.display = 'flex';
+            document.getElementById('filterLabel').innerText = `ALL ORDERS`;
         }
 
-        const sortedList = [...displayList].reverse();
+        // Calculate Totals for the VIEWED list
+        let totalCount = 0;
+        let totalVal = 0;
 
-        if (sortedList.length === 0) {
-            tableBody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No matching orders.</td></tr>";
+        // Render Rows
+        let html = "";
+        // Sort reverse chronological
+        const sorted = [...filteredData].reverse();
+
+        if (sorted.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px'>No matches found.</td></tr>";
+            document.getElementById('filterCount').innerText = "0";
+            document.getElementById('filterVal').innerText = "₱0";
             return;
         }
 
-        sortedList.forEach(item => {
-            const printLoc = item.printLoc || "Front"; 
-            const status = item.status || "Pending"; 
+        sorted.forEach(item => {
+            // Stats Calculation
+            totalCount++;
+            if (item.status !== "Cancelled") {
+                totalVal += Number(item.price);
+            }
 
-            // COLOR CLASS FOR STATUS
+            const status = item.status || "Pending";
             let statusClass = "st-pending";
             if(status === "Paid") statusClass = "st-paid";
             if(status === "For Delivery") statusClass = "st-delivery";
             if(status === "Cancelled") statusClass = "st-cancelled";
 
-            const rowStyle = status === "Cancelled" ? "opacity: 0.5;" : "";
+            const rowOpacity = status === "Cancelled" ? "0.5" : "1";
 
             html += `
-                <tr style="${rowStyle}">
-                    <td style="font-size: 0.8rem; color:#888;">${item.date}</td>
-                    <td style="font-weight:bold; color: #fff;">${item.customerName}</td>
+                <tr style="opacity: ${rowOpacity}">
+                    <td style="color:#666;">${item.date}</td>
+                    <td style="font-weight:bold; color:#fff;">${item.customerName}</td>
                     <td>
-                        <div style="font-weight:600; font-size: 0.95rem;">${item.designName}</div>
-                        <div style="margin-top:4px;">
-                            <span class="badge bg-loc">${printLoc}</span>
-                            <span style="font-size:0.75rem; color:#aaa;">${item.shirtColor}</span>
+                        <div style="font-size:0.85rem; font-weight:600;">${item.designName}</div>
+                        <div style="font-size:0.7rem; margin-top:3px;">
+                            <span class="badge bg-loc">${item.printLoc}</span>
+                            <span style="color:#aaa;">${item.shirtColor}</span>
                         </div>
                     </td>
                     <td><span class="badge bg-size">${item.size}</span></td>
-                    
                     <td>
                         <select onchange="updateStatus('${item.id}', this.value)" class="status-select ${statusClass}">
                             <option value="Pending" ${status=='Pending'?'selected':''}>PENDING</option>
@@ -546,42 +659,39 @@
                             <option value="Cancelled" ${status=='Cancelled'?'selected':''}>CANCEL</option>
                         </select>
                     </td>
-
-                    <td style="color: #00e676; font-weight:bold;">₱${item.price}</td>
-                    <td>
-                        <button class="del-btn" onclick="deleteOrder('${item.id}')">X</button>
-                    </td>
+                    <td style="font-weight:bold; color:var(--accent-green)">₱${item.price}</td>
+                    <td><button class="del-btn" onclick="deleteOrder('${item.id}')">X</button></td>
                 </tr>
             `;
         });
 
-        tableBody.innerHTML = html;
+        tbody.innerHTML = html;
+        document.getElementById('filterCount').innerText = totalCount;
+        document.getElementById('filterVal').innerText = "₱" + totalVal.toLocaleString();
     }
 
-    // --- UPDATE STATUS (LIVE REFRESH) ---
+    // --- ACTIONS ---
     async function updateStatus(id, newStatus) {
-        try {
-            // Update Database
-            await fetch(`${dbUrl}/${id}.json`, {
-                method: 'PATCH',
-                body: JSON.stringify({ status: newStatus }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            // Reload to apply "Auto Minus" logic
-            loadData(); 
-        } catch (err) {
-            alert("Failed to update status");
+        await fetch(`${dbUrl}/${id}.json`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: newStatus }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        loadData();
+    }
+
+    async function deleteOrder(id) {
+        if(confirm("Delete permanently?")) {
+            await fetch(`${dbUrl}/${id}.json`, { method: 'DELETE' });
+            loadData();
         }
     }
 
-    // --- SAVE ORDER ---
     document.getElementById('orderForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
-        
-        btn.disabled = true;
-        btn.innerText = "SAVING...";
+        btn.disabled = true; btn.innerText = "SAVING...";
 
         const newItem = {
             customerName: document.getElementById('customerName').value,
@@ -590,7 +700,7 @@
             printLoc: document.getElementById('printLoc').value,
             shirtColor: document.getElementById('shirtColor').value,
             size: document.getElementById('size').value,
-            status: document.getElementById('status').value, 
+            status: document.getElementById('status').value,
             price: document.getElementById('price').value,
             timestamp: new Date().toISOString()
         };
@@ -601,35 +711,22 @@
                 body: JSON.stringify(newItem),
                 headers: { 'Content-Type': 'application/json' }
             });
-
-            msg.style.color = "#00e676";
-            msg.innerText = "ORDER SAVED!";
+            msg.style.color = "#00e676"; msg.innerText = "SUCCESS";
             document.getElementById('orderForm').reset();
             document.getElementById('orderDate').valueAsDate = new Date();
-            loadData(); 
-        } catch (error) {
-            msg.style.color = "red";
-            msg.innerText = "FAILED TO SAVE";
+            loadData();
+        } catch (e) {
+            msg.style.color = "red"; msg.innerText = "ERROR";
         } finally {
-            btn.disabled = false;
-            btn.innerText = "SAVE ORDER";
+            btn.disabled = false; btn.innerText = "SAVE ORDER";
             setTimeout(() => msg.innerText = "", 2000);
         }
     });
 
-    // --- DELETE ORDER ---
-    async function deleteOrder(id) {
-        if(confirm("Delete this order permanently?")) {
-            await fetch(`${dbUrl}/${id}.json`, { method: 'DELETE' });
-            loadData();
-        }
-    }
-
     // --- INIT ---
     loadData();
-    setInterval(loadData, 10000); 
+    setInterval(loadData, 10000); // Live Refresh
 
 </script>
-
 </body>
 </html>
